@@ -1725,6 +1725,25 @@ struct ASTNode {
 llvm::json::Value toJSON(const ASTNode &);
 llvm::raw_ostream &operator<<(llvm::raw_ostream &, const ASTNode &);
 
+/// Payload for textDocument/ast/native  request.
+/// This request is a clangd extension for AST specific needs.
+struct NativeASTParams{
+  /// The text document.
+  TextDocumentIdentifier textDocument;
+  /// The file uri that will be used to store the native serialized AST
+  URIForFile astFile;
+};
+bool fromJSON(const llvm::json::Value &, NativeASTParams &, llvm::json::Path);
+
+/// Description of a parsed and serialized clang AST
+struct NativeAST {
+  /// Number of declarations outside of the preamble
+  int nbDeclarations;
+  /// Uri of the AST output file
+  std::string astFile;
+};
+llvm::json::Value toJSON(const NativeAST &Native);
+
 } // namespace clangd
 } // namespace clang
 

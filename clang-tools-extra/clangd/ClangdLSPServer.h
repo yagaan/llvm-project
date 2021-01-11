@@ -93,10 +93,12 @@ private:
   void onInitialized(const InitializedParams &);
   void onShutdown(const ShutdownParams &, Callback<std::nullptr_t>);
   void onSync(const NoParams &, Callback<std::nullptr_t>);
+  void onDocumentBackgroundParsing(const DidOpenTextDocumentParams &);
   void onDocumentDidOpen(const DidOpenTextDocumentParams &);
   void onDocumentDidChange(const DidChangeTextDocumentParams &);
   void onDocumentDidClose(const DidCloseTextDocumentParams &);
   void onDocumentDidSave(const DidSaveTextDocumentParams &);
+  void onNativeAST(const NativeASTParams &, Callback<llvm::Optional<NativeAST>> );
   void onAST(const ASTParams &, Callback<llvm::Optional<ASTNode>>);
   void onDocumentOnTypeFormatting(const DocumentOnTypeFormattingParams &,
                                   Callback<std::vector<TextEdit>>);

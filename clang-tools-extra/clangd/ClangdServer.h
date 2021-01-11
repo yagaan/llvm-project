@@ -324,6 +324,12 @@ public:
   /// Describe the AST subtree for a piece of code.
   void getAST(PathRef File, Range R, Callback<llvm::Optional<ASTNode>> CB);
 
+  /// Describe the AST whole tree.
+  void getWholeAST(PathRef File, Callback<llvm::Optional<ASTNode>> CB); 
+  
+  /// Serialize clang AST in JSON and returns native AST description
+  void getNativeAST(PathRef File, PathRef OutputFile,Callback<llvm::Optional<NativeAST>> CB);
+
   /// Runs an arbitrary action that has access to the AST of the specified file.
   /// The action will execute on one of ClangdServer's internal threads.
   /// The AST is only valid for the duration of the callback.

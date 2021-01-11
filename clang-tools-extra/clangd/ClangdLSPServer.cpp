@@ -673,6 +673,17 @@ void ClangdLSPServer::onDocumentDidOpen(
                       WantDiagnostics::Yes);
 }
 
+void ClangdLSPServer::onDocumentBackgroundParsing(
+    const DidOpenTextDocumentParams &Params) {
+  PathRef File = Params.textDocument.uri.file();
+
+  const std::string &Contents = Params.textDocument.text;
+
+  auto Version = DraftMgr.addDraft(File, Params.textDocument.version, Contents);
+  Server->addDocument(File, Contents, encodeVersion(Version),
+                      WantDiagnostics::No);
+}
+
 void ClangdLSPServer::onDocumentDidChange(
     const DidChangeTextDocumentParams &Params) {
   auto WantDiags = WantDiagnostics::Auto;
@@ -1453,8 +1464,22 @@ void ClangdLSPServer::onMemoryUsage(const NoParams &,
 
 void ClangdLSPServer::onAST(const ASTParams &Params,
                             Callback<llvm::Optional<ASTNode>> CB) {
-  Server->getAST(Params.textDocument.uri.file(), Params.range, std::move(CB));
+  if(Params.range.start.line==-1){
+    Server->getWholeAST(Params.textDocument.uri.file(), std::move(CB));
+  }else{
+    Server->getAST(Params.textDocument.uri.file(), Params.range, std::move(CB));
+  }                             
+ 
 }
+
+void ClangdLSPServer::onNativeAST(const NativeASTParams &Params,
+                            Callback<llvm::Optional<NativeAST>> CB) {
+
+  Server->getNativeAST(Params.textDocument.uri.file(),  Params.astFile.file(), std::move(CB));
+
+}
+
+
 
 ClangdLSPServer::ClangdLSPServer(class Transport &Transp,
                                  const ThreadsafeFS &TFS,
@@ -1492,7 +1517,9 @@ ClangdLSPServer::ClangdLSPServer(class Transport &Transp,
   MsgHandler->bind("textDocument/documentHighlight", &ClangdLSPServer::onDocumentHighlight);
   MsgHandler->bind("workspace/symbol", &ClangdLSPServer::onWorkspaceSymbol);
   MsgHandler->bind("textDocument/ast", &ClangdLSPServer::onAST);
+  MsgHandler->bind("textDocument/ast/native", &ClangdLSPServer::onNativeAST);
   MsgHandler->bind("textDocument/didOpen", &ClangdLSPServer::onDocumentDidOpen);
+  MsgHandler->bind("textDocument/background/parse", &ClangdLSPServer::onDocumentBackgroundParsing);
   MsgHandler->bind("textDocument/didClose", &ClangdLSPServer::onDocumentDidClose);
   MsgHandler->bind("textDocument/didChange", &ClangdLSPServer::onDocumentDidChange);
   MsgHandler->bind("textDocument/didSave", &ClangdLSPServer::onDocumentDidSave);

@@ -32,6 +32,7 @@
 #include "support/MemoryTree.h"
 #include "support/ThreadsafeFS.h"
 #include "support/Trace.h"
+#include "clang/AST/ASTDumperUtils.h"
 #include "clang/Format/Format.h"
 #include "clang/Frontend/CompilerInstance.h"
 #include "clang/Frontend/CompilerInvocation.h"
@@ -57,6 +58,8 @@
 #include <mutex>
 #include <string>
 #include <type_traits>
+#include <iostream>
+#include <fstream>  
 
 namespace clang {
 namespace clangd {
@@ -804,6 +807,62 @@ void ClangdServer::getAST(PathRef File, Range R,
       };
   WorkScheduler.runWithAST("GetAST", File, std::move(Action));
 }
+
+void ClangdServer::getWholeAST(PathRef File, 
+                          Callback<llvm::Optional<ASTNode>> CB) {
+  auto Action =
+      [ CB(std::move(CB))](llvm::Expected<InputsAndAST> Inputs) mutable {
+        if (!Inputs)
+          return CB(Inputs.takeError());
+        clangd::ASTNode cu;
+        cu.role="compilationUnit";
+        for(const Decl *decl : Inputs->AST.getLocalTopLevelDecls()){
+          cu.children.push_back(dumpAST(DynTypedNode::create(*decl), Inputs->AST.getTokens(), Inputs->AST.getASTContext()));
+        }
+
+        CB(std::move(cu));
+      };
+  WorkScheduler.runWithAST("GetAST", File, std::move(Action));
+}
+
+void ClangdServer::getNativeAST(PathRef File, PathRef OutputFile,
+                          Callback<llvm::Optional<NativeAST>> CB) {
+    auto Action =
+      [O = OutputFile.str(), CB(std::move(CB))](llvm::Expected<InputsAndAST> Inputs) mutable {
+        if (!Inputs)
+          return CB(Inputs.takeError());
+        
+        
+        StringRef DirName = llvm::sys::path::parent_path(O);
+        if(!llvm::sys::fs::exists(DirName))
+          return CB(Inputs.takeError());
+         
+        clangd::NativeAST native;
+        native.nbDeclarations=0;
+        native.astFile = O;
+        std::error_code EC;
+        llvm::raw_fd_ostream OS(O, EC, llvm::sys::fs::F_None);
+
+        OS << "{\n\"kind\" :\"CompilationUnit\" ,\n\"inner\": [\n";
+        ArrayRef<Decl *> declarations = Inputs->AST.getLocalTopLevelDecls();
+        int nbDecls = declarations.size();
+        for(int i=0;i<nbDecls;i++){ 
+          Decl* decl = declarations[i];
+          decl->dump(OS,false,ASTDumpOutputFormat::ADOF_JSON);
+          native.nbDeclarations++;
+          if(i<nbDecls-1){
+            OS << ",\n";
+          }
+        }
+        
+        OS << "\n]}";
+     
+
+        CB(std::move(native));
+      };
+      WorkScheduler.runWithAST("GetAST", File, std::move(Action));
+}
+
 
 void ClangdServer::customAction(PathRef File, llvm::StringRef Name,
                                 Callback<InputsAndAST> Action) {

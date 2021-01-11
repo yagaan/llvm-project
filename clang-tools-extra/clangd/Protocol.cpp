@@ -1393,6 +1393,20 @@ llvm::json::Value toJSON(const ASTNode &N) {
   return Result;
 }
 
+bool fromJSON(const llvm::json::Value &Params, NativeASTParams &R,
+              llvm::json::Path P) {
+  llvm::json::ObjectMapper O(Params, P);
+  return O && O.map("textDocument", R.textDocument) && O.map("astFile", R.astFile);
+}
+
+llvm::json::Value toJSON(const NativeAST &N) {
+  llvm::json::Object Result{
+      {"nbDeclarations", N.nbDeclarations},
+      {"astFile", N.astFile}
+  };
+  return Result;
+}
+
 llvm::raw_ostream &operator<<(llvm::raw_ostream &OS, const ASTNode &Root) {
   std::function<void(const ASTNode &, unsigned)> Print = [&](const ASTNode &N,
                                                              unsigned Level) {
