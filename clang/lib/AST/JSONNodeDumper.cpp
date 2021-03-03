@@ -313,9 +313,7 @@ llvm::json::Object JSONNodeDumper::createBareDeclRef(const Decl *D) {
 
   //  fill referenced declaration's file 
   SourceManager& SrcMgr = D->getASTContext().getSourceManager();
-  clang::FileID fileID = SrcMgr.getFileID(D->getLocation());
-  const FileEntry* Entry = SrcMgr.getFileEntryForID(fileID);
-  const llvm::StringRef FileName = Entry->getName();
+  const llvm::StringRef FileName = SrcMgr.getFilename(D->getLocation());
   Ret["file"] = FileName;
 
   Ret["kind"] = (llvm::Twine(D->getDeclKindName()) + "Decl").str();
