@@ -288,7 +288,8 @@ public:
   void VisitCXXBindTemporaryExpr(const CXXBindTemporaryExpr *BTE);
   void VisitMaterializeTemporaryExpr(const MaterializeTemporaryExpr *MTE);
   void VisitCXXDependentScopeMemberExpr(const CXXDependentScopeMemberExpr *ME);
-
+  void VisitArraySubscriptExpr(const ArraySubscriptExpr *SE);
+  
   void VisitObjCEncodeExpr(const ObjCEncodeExpr *OEE);
   void VisitObjCMessageExpr(const ObjCMessageExpr *OME);
   void VisitObjCBoxedExpr(const ObjCBoxedExpr *OBE);

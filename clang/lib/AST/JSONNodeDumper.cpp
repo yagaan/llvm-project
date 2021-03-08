@@ -1228,6 +1228,14 @@ void JSONNodeDumper::VisitCXXDeleteExpr(const CXXDeleteExpr *DE) {
     JOS.attribute("operatorDeleteDecl", createBareDeclRef(FD));
 }
 
+void JSONNodeDumper::VisitArraySubscriptExpr(
+    const ArraySubscriptExpr *SE) {
+  JOS.attribute("base",
+                createPointerRepresentation(SE->getBase()));
+  JOS.attribute("idx",
+                createPointerRepresentation(SE->getIdx()));
+}
+
 void JSONNodeDumper::VisitCXXThisExpr(const CXXThisExpr *TE) {
   attributeOnlyIfTrue("implicit", TE->isImplicit());
 }
