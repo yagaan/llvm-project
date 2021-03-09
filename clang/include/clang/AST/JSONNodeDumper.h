@@ -289,6 +289,7 @@ public:
   void VisitMaterializeTemporaryExpr(const MaterializeTemporaryExpr *MTE);
   void VisitCXXDependentScopeMemberExpr(const CXXDependentScopeMemberExpr *ME);
   void VisitArraySubscriptExpr(const ArraySubscriptExpr *SE);
+  void VisitForStmt(const ForStmt *FS);
   
   void VisitObjCEncodeExpr(const ObjCEncodeExpr *OEE);
   void VisitObjCMessageExpr(const ObjCMessageExpr *OME);

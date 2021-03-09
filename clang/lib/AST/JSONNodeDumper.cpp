@@ -1228,13 +1228,6 @@ void JSONNodeDumper::VisitCXXDeleteExpr(const CXXDeleteExpr *DE) {
     JOS.attribute("operatorDeleteDecl", createBareDeclRef(FD));
 }
 
-void JSONNodeDumper::VisitArraySubscriptExpr(
-    const ArraySubscriptExpr *SE) {
-  JOS.attribute("base",
-                createPointerRepresentation(SE->getBase()));
-  JOS.attribute("idx",
-                createPointerRepresentation(SE->getIdx()));
-}
 
 void JSONNodeDumper::VisitCXXThisExpr(const CXXThisExpr *TE) {
   attributeOnlyIfTrue("implicit", TE->isImplicit());
@@ -1642,4 +1635,36 @@ void JSONNodeDumper::visitVerbatimBlockLineComment(
 void JSONNodeDumper::visitVerbatimLineComment(
     const comments::VerbatimLineComment *C, const comments::FullComment *) {
   JOS.attribute("text", C->getText());
+}
+
+//ADDITIONS
+
+
+void JSONNodeDumper::VisitArraySubscriptExpr(
+    const ArraySubscriptExpr *SE) {
+  JOS.attribute("base",
+                createPointerRepresentation(SE->getBase()));
+  JOS.attribute("idx",
+                createPointerRepresentation(SE->getIdx()));
+}
+
+
+void JSONNodeDumper::VisitForStmt(
+    const ForStmt *FS) {
+  if(FS->getInit()!=NULL){
+    JOS.attribute("init",
+                createPointerRepresentation(FS->getInit()));
+  }
+  if(FS->getInc()!=NULL){
+    JOS.attribute("inc",
+                createPointerRepresentation(FS->getInc()));
+  }
+  if(FS->getCond()!=NULL){
+    JOS.attribute("cond",
+                createPointerRepresentation(FS->getCond()));
+  }
+  if(FS->getBody()!=NULL){
+    JOS.attribute("body",
+                createPointerRepresentation(FS->getBody()));
+  }
 }
