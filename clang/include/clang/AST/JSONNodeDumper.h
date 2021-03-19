@@ -315,7 +315,7 @@ public:
   void VisitGotoStmt(const GotoStmt *GS);
   void VisitWhileStmt(const WhileStmt *WS);
   void VisitObjCAtCatchStmt(const ObjCAtCatchStmt *OACS);
-
+  void VisitCXXForRangeStmt(const CXXForRangeStmt *FRS) ;
   void VisitNullTemplateArgument(const TemplateArgument &TA);
   void VisitTypeTemplateArgument(const TemplateArgument &TA);
   void VisitDeclarationTemplateArgument(const TemplateArgument &TA);
@@ -428,6 +428,12 @@ public:
   }
   void VisitVarTemplateDecl(const VarTemplateDecl *VTD) {
     writeTemplateDecl(VTD, false);
+  }
+
+  void VisitCXXForRangeStmt(const CXXForRangeStmt *FRS){
+    //also visit original syntactic components
+    Visit(FRS->getRangeInit()); 
+    Visit(FRS->getLoopVariable()); 
   }
 };
 

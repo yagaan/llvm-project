@@ -1668,3 +1668,19 @@ void JSONNodeDumper::VisitForStmt(
                 createPointerRepresentation(FS->getBody()));
   }
 }
+
+
+void JSONNodeDumper::VisitCXXForRangeStmt(const CXXForRangeStmt *FRS){
+  if(FRS->getRangeInit()!=NULL){
+    JOS.attribute("rangeExpressionId",createPointerRepresentation(FRS->getRangeInit()));
+  }
+  if(FRS->getLoopVariable()!=NULL){
+    JOS.attribute("rangeDeclaratorId",createPointerRepresentation(FRS->getLoopVariable()));
+  }
+  if(FRS->getRangeInit()!=NULL){
+    JOS.attribute("bodyId",createPointerRepresentation(FRS->getBody()));
+  }
+  if(FRS->getInit()!=NULL){
+    JOS.attribute("initId",createPointerRepresentation(FRS->getInit()));
+  }
+}
