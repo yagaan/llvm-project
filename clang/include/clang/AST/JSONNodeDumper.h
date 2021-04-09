@@ -290,6 +290,7 @@ public:
   void VisitCXXDependentScopeMemberExpr(const CXXDependentScopeMemberExpr *ME);
   void VisitArraySubscriptExpr(const ArraySubscriptExpr *SE);
   void VisitForStmt(const ForStmt *FS);
+  void VisitCXXFoldExpr(const CXXFoldExpr *FE);
   
   void VisitObjCEncodeExpr(const ObjCEncodeExpr *OEE);
   void VisitObjCMessageExpr(const ObjCMessageExpr *OME);

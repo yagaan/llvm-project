@@ -1684,3 +1684,15 @@ void JSONNodeDumper::VisitCXXForRangeStmt(const CXXForRangeStmt *FRS){
     JOS.attribute("initId",createPointerRepresentation(FRS->getInit()));
   }
 }
+
+void JSONNodeDumper::VisitCXXFoldExpr(const CXXFoldExpr *FE){
+  JOS.attribute("opcode", BinaryOperator::getOpcodeStr(FE->getOperator()));
+  JOS.attribute("rfe",FE->isRightFold());
+  JOS.attribute("lfe",FE->isLeftFold());
+  if(FE->getLHS()!=NULL){
+    JOS.attribute("lhsId",createPointerRepresentation(FE->getLHS()));
+  }
+  if(FE->getRHS()!=NULL){
+    JOS.attribute("rhsId",createPointerRepresentation(FE->getRHS()));
+  }
+}
